@@ -14,7 +14,7 @@ namespace SpaceImmigrants
             Event.InputBegan.Invoked += (key) => {
                 if (key == Keys.J)
                 {
-                    BombProjectile bomb = new(
+                    Projectile pellet = new(
                         currentGame,
                         currentGame.LocalPlayer.Position + new Vector2(0, 20),
                         new Vector2(0, -500),

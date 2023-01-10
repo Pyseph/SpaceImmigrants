@@ -20,10 +20,11 @@ namespace SpaceImmigrants
             Event.GameEnded.Invoked += (ended) => {
                 currentGame.DrawQueue.Add(this, (double step) => {
                     // draw a Game Over message on the center of the screen
-                    Vector2 messageSize = this._fontSprite.MeasureString("Game Over");
+                    string message = $"Game Over\nFinal Points: {currentGame.Points}";
+                    Vector2 messageSize = this._fontSprite.MeasureString(message);
                     Game1.SpriteBatch.DrawString(
                         this._fontSprite,
-                        "Game Over",
+                        message,
                         new Vector2(
                             Game1.ViewportSize.X / 2 - (messageSize.X / 2),
                             Game1.ViewportSize.Y / 2 - (messageSize.Y / 2)

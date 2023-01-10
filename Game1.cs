@@ -8,12 +8,13 @@ using System;
 namespace SpaceImmigrants
 {
     public class Game1 : Game
-    {
-		 public Dictionary<object, Action<double>> DrawQueue = new();
-		 public List<HurtBox> HurtBoxes = new();
-		 public List<Enemy> Enemies = new();
-		 public bool GameEnded = false;
-		 public Dictionary<string, Texture2D> EnemySprites = new();
+	{
+		public Dictionary<object, Action<double>> DrawQueue = new();
+		public List<HurtBox> HurtBoxes = new();
+		public List<Enemy> Enemies = new();
+		public bool GameEnded = false;
+		public Dictionary<string, Texture2D> EnemySprites = new();
+		public int Points = 0;
 
         public static SpriteBatch SpriteBatch;
 		public Player LocalPlayer;
@@ -140,6 +141,11 @@ namespace SpaceImmigrants
 
 		public void GameOver()
 		{
+			if (GameEnded)
+			{
+				return;
+			}
+
 			GameEnded = true;
 			Event.GameEnded.Invoke(true);
 		}
@@ -162,10 +168,6 @@ namespace SpaceImmigrants
 			UpdateEnemies(delta);
 
 			base.Update(gameTime);
-
-			elapsedGameTime = gameTime.ElapsedGameTime;
-			delta = (double)elapsedGameTime.TotalSeconds;
-			Event.GamePostStepped.Invoke(delta);
         }
 
 		protected override void Draw(GameTime gameTime)
@@ -177,11 +179,11 @@ namespace SpaceImmigrants
 			TimeSpan elapsedGameTime = gameTime.ElapsedGameTime;
 			double delta = (float)elapsedGameTime.TotalSeconds;
 
-			// Iterate through the draw queue dictionary and draw each item
 			if (GameEnded)
 			{
 				delta = 0;
 			}
+			// Iterate through the draw queue dictionary and draw each item
 			foreach (KeyValuePair<object, Action<double>> item in DrawQueue)
 			{
 				item.Value.Invoke(delta);
@@ -189,6 +191,10 @@ namespace SpaceImmigrants
 			SpriteBatch.End();
 
 			base.Draw(gameTime);
+
+			elapsedGameTime = gameTime.ElapsedGameTime;
+			delta = (double)elapsedGameTime.TotalSeconds;
+			Event.GamePostStepped.Invoke(delta);
 		}
     }
 }

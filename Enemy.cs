@@ -12,8 +12,10 @@ namespace SpaceImmigrants
         public float MovementSpeed;
         public Vector2 Velocity;
         public Vector2 Position;
+        public string Type;
         public int Lives;
         public event EventHandler PositionChanged;
+        public HurtBox HurtBox;
 
         private Texture2D _enemySprite;
         private Game1 _currentGame;
@@ -48,6 +50,12 @@ namespace SpaceImmigrants
             { "Fly", 1 },
             { "Tank", 3 },
         };
+        private static Dictionary<string, int> _enemyPoints = new()
+        {
+            { "Normal", 3 },
+            { "Fly", 5 },
+            { "Tank", 10 },
+        };
 
         public Enemy(Game1 currentGame, EnemyData Data)
         {;
@@ -58,6 +66,12 @@ namespace SpaceImmigrants
             this.SpriteSize = Data.Size;
             this._currentGame = currentGame;
             this.Lives = _enemyLives[Data.Type];
+            this.Type = Data.Type;
+            this.HurtBox = new HurtBox(this);
+
+            if (Data.Type == "Tank"){
+                new TankProjectileShooter(currentGame, this);
+            }
 
             // Add a callback to the DrawQueue to draw the player, using gameTime argument to animate the sprite.
 			currentGame.DrawQueue.Add(this, (double step) => {
@@ -84,14 +98,22 @@ namespace SpaceImmigrants
                 );
 			});
 
-            currentGame.HurtBoxes.Add(new HurtBox(this));
+            currentGame.HurtBoxes.Add(this.HurtBox);
             currentGame.Enemies.Add(this);
         }
 
         public virtual void Destroy()
         {
-            this._currentGame.DrawQueue.Remove(this);
-            this._currentGame.Enemies.Remove(this);
+            // wait for GamePreStepped to run once before removing the enemy
+            // This is to prevent race conditions with removing objects from the list while also iterating over it
+            Event.GamePreStepped.Invoked += (step) =>
+            {
+                this._currentGame.DrawQueue.Remove(this);
+                this._currentGame.Enemies.Remove(this);
+                this._currentGame.HurtBoxes.RemoveAll((hurtBox) => hurtBox.Parent == this);
+
+                Event.GamePreStepped.Invoked -= (step) => { };
+            };
         }
 
         public void EnemyHit(Game1 currentGame)
@@ -100,6 +122,7 @@ namespace SpaceImmigrants
             this.Lives -= 1;
             if (this.Lives <= 0)
             {
+                currentGame.Points += _enemyPoints[this.Type];
                 Destroy();
             }
         }

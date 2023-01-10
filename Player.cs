@@ -15,6 +15,7 @@ namespace SpaceImmigrants
         public static float MovementSpeed = 200;
         public Vector2 Velocity = new(0, 0);
         public Vector2 Position;
+        public Rectangle PlayerRect;
 
         private Texture2D _playerSprite;
         private Texture2D _movementSprite;
@@ -45,6 +46,7 @@ namespace SpaceImmigrants
 
             this._statusBar = new StatusBar(currentGame);
             new PlayerProjectileShooter(currentGame);
+            new PointsDisplay(currentGame);
 
             // Listen to the InputBegan event and move the player when the user presses the arrow keys.
             Event.InputBegan.Invoked += (key) => {
@@ -77,6 +79,8 @@ namespace SpaceImmigrants
                     (int)this.SpriteSize.X,
                     (int)this.SpriteSize.Y
                 );
+                this.PlayerRect = destination;
+
                 //Debug.WriteLine(playerPosition);
 
 				Game1.SpriteBatch.Draw(
@@ -127,16 +131,11 @@ namespace SpaceImmigrants
                 return;
             }
 
+            Rectangle playerRect = this.PlayerRect;
             foreach (HurtBox hurtBox in currentGame.HurtBoxes)
             {
-                // error: 'object' does not contain a definition for 'Position' and no accessible extension method 'Position' accepting a first argument of type 'object' could be found
-                // fix: cast to HurtBox
-                // like so: ((HurtBox)hurtBox).Position
-
-                if (hurtBox.Position.X < this.Position.X + this.SpriteSize.X &&
-                    hurtBox.Position.X + hurtBox.SpriteSize.X > this.Position.X &&
-                    hurtBox.Position.Y < this.Position.Y + this.SpriteSize.Y &&
-                    hurtBox.Position.Y + hurtBox.SpriteSize.Y > this.Position.Y)
+                Rectangle hurtBoxRect = hurtBox.Rect;
+                if (playerRect.Intersects(hurtBoxRect))
                 {
                     // Collision detected
                     PlayerHit(currentGame);
