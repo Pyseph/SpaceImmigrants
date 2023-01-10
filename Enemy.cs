@@ -15,6 +15,7 @@ namespace SpaceImmigrants
         public string Type;
         public int Lives;
         public event EventHandler PositionChanged;
+        public event EventHandler Died;
         public HurtBox HurtBox;
 
         private Texture2D _enemySprite;
@@ -106,19 +107,22 @@ namespace SpaceImmigrants
         {
             // wait for GamePreStepped to run once before removing the enemy
             // This is to prevent race conditions with removing objects from the list while also iterating over it
-            Event.GamePreStepped.Invoked += (step) =>
-            {
+            Died?.Invoke(this, EventArgs.Empty);
+
+            void diedConnection(double step)
+			{
                 this._currentGame.DrawQueue.Remove(this);
                 this._currentGame.Enemies.Remove(this);
                 this._currentGame.HurtBoxes.RemoveAll((hurtBox) => hurtBox.Parent == this);
+                Event.GamePreStepped.Invoked -= diedConnection;
+            }
 
-                Event.GamePreStepped.Invoked -= (step) => { };
-            };
+            Event.InvokedEvent<double>.InvokedDelegate preSteppedConnection = diedConnection;
+            Event.GamePreStepped.Invoked += preSteppedConnection;
         }
 
         public void EnemyHit(Game1 currentGame)
         {
-            Debug.WriteLine("Enemy hit! " + this.Lives);
             this.Lives -= 1;
             if (this.Lives <= 0)
             {

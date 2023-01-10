@@ -35,7 +35,7 @@ namespace SpaceImmigrants
                 Game1.SpriteBatch.Draw(
                     projectileSprite,
                     this.Rect,
-                    Color.White
+                    this.Mode == "Player" ? Color.Red : Color.White
                 );
             });
         }

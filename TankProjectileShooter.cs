@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
+using static SpaceImmigrants.Event;
 
 namespace SpaceImmigrants
 {
@@ -15,7 +16,7 @@ namespace SpaceImmigrants
         {
 			double timePassed = 0;
 
-            Event.GamePreStepped.Invoked += (double step) => {
+			Event.InvokedEvent<double>.InvokedDelegate preSteppedConnection = (double step) => {
 				timePassed += step;
 				if (timePassed < ShootingSpeed) return;
 				timePassed = 0;
@@ -31,6 +32,14 @@ namespace SpaceImmigrants
 					Mode: "Player"
 				);
 			};
+			Event.GamePreStepped.Invoked += preSteppedConnection;
+
+			void diedConnection(object sender, EventArgs args)
+			{
+				Event.GamePreStepped.Invoked -= preSteppedConnection;
+				tank.Died -= diedConnection;
+			}
+			tank.Died += diedConnection;
         }
     }
 }

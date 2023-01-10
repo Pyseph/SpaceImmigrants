@@ -97,12 +97,41 @@ namespace SpaceImmigrants
 
 		private string getEnemyType(float currentTime)
 		{
-			// There exist 3 enemy types: the first has a 100% chance of spawning since the start
-			// while the other two have a 50% chance of spawning after 20 seconds and 40 seconds respectively.
-			// The enemy types are: Normal, Fly, Tank
-			if (currentTime < 20) return "Normal";
-			if (currentTime < 40) return new Random().Next(0, 2) == 0 ? "Normal" : "Fly";
-			return new Random().Next(0, 2) == 0 ? "Fly" : "Tank";
+			float random = (float)new Random().NextDouble();
+			Dictionary<string, float> enemyTypeWeights = new()
+			{
+				{ "Normal", 0.5f },
+				{ "Fly", 0.25f },
+				{ "Tank", 0.1f }
+			};
+
+			// Increase the weights of the harder enemies over time
+			enemyTypeWeights["Fly"] += (float)Math.Min(currentTime / 20, 0.25);
+			enemyTypeWeights["Tank"] += (float)Math.Min(currentTime / 20, 0.1);
+
+			// Normalize the weights
+			float totalWeight = 0;
+			foreach (float weight in enemyTypeWeights.Values)
+			{
+				totalWeight += weight;
+			}
+			foreach (string enemyType in enemyTypeWeights.Keys)
+			{
+				enemyTypeWeights[enemyType] /= totalWeight;
+			}
+
+			// Use weighted random to determine which enemy type to spawn
+			float currentWeight = 0;
+			foreach (string enemyType in enemyTypeWeights.Keys)
+			{
+				currentWeight += enemyTypeWeights[enemyType];
+				if (random < currentWeight)
+				{
+					return enemyType;
+				}
+			}
+
+			return "Normal";
 		}
 		public void UpdateEnemies(double delta)
 		{
