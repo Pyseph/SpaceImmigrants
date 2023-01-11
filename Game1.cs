@@ -15,6 +15,7 @@ namespace SpaceImmigrants
 		public bool GameEnded = false;
 		public Dictionary<string, Texture2D> EnemySprites = new();
 		public int Points = 0;
+		public double GameTime = 0;
 
         public static SpriteBatch SpriteBatch;
 		public Player LocalPlayer;
@@ -24,6 +25,7 @@ namespace SpaceImmigrants
         private GraphicsDeviceManager _graphics;
 		private float _currentTime = 0;
 		private float _lastSpawnedEnemy = 0;
+		private float _lastSpawnedPowerup = 0;
         public Game1()
         {
         	_graphics = new GraphicsDeviceManager(this);
@@ -33,7 +35,6 @@ namespace SpaceImmigrants
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
 			LocalPlayer = new Player(this);
 
             base.Initialize();
@@ -47,11 +48,9 @@ namespace SpaceImmigrants
 			EnemySprites.Add("Normal", Content.Load<Texture2D>("EnemyMongus"));
 			EnemySprites.Add("Fly", Content.Load<Texture2D>("MongusFly"));
 			EnemySprites.Add("Tank", Content.Load<Texture2D>("MongusTank"));
-
-            // TODO: use this.Content to load your game content here
         }
 
-		public void UpdateInputs()
+		private void updateInputs()
 		{
 			MouseState mouseState = Mouse.GetState();
 			KeyboardState keyboardState = Keyboard.GetState();
@@ -133,9 +132,8 @@ namespace SpaceImmigrants
 
 			return "Normal";
 		}
-		public void UpdateEnemies(double delta)
+		private void spawnEnemies()
 		{
-			_currentTime += (float)delta;
 			// Start spawning enemies every 3 seconds, and slowly increase the spawn rate
 			float spawnRate = 2 - (_currentTime / 20);
 			spawnRate = Math.Max(spawnRate, 0.5f);
@@ -167,16 +165,30 @@ namespace SpaceImmigrants
 				));
 			}
 		}
-
-		public void GameOver()
+		private void spawnPowerup()
 		{
-			if (GameEnded)
+			if (_currentTime - _lastSpawnedPowerup < 10)
 			{
 				return;
 			}
 
-			GameEnded = true;
-			Event.GameEnded.Invoke(true);
+			_lastSpawnedPowerup = _currentTime;
+			new PlayerPowerup(this);
+		}
+
+		public void GameOver()
+		{
+			if (GameEnded) return;
+
+            void gameEndedConnection(double step)
+			{
+				GameEnded = true;
+                Event.GameEnded.Invoke(true);
+                Event.GamePreStepped.Invoked -= gameEndedConnection;
+            }
+
+            Event.InvokedEvent<double>.InvokedDelegate preSteppedConnection = gameEndedConnection;
+            Event.GamePreStepped.Invoked += preSteppedConnection;
 		}
 
         protected override void Update(GameTime gameTime)
@@ -184,17 +196,19 @@ namespace SpaceImmigrants
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
+			this.GameTime = gameTime.TotalGameTime.TotalSeconds;
+
 			TimeSpan elapsedGameTime = gameTime.ElapsedGameTime;
 			double delta = (float)elapsedGameTime.TotalSeconds;
 
-			if (GameEnded)
-			{
-				return;
-			}
+			if (GameEnded) return;
 			Event.GamePreStepped.Invoke(delta);
 
-            UpdateInputs();
-			UpdateEnemies(delta);
+			_currentTime += (float)delta;
+
+            updateInputs();
+			spawnEnemies();
+			spawnPowerup();
 
 			base.Update(gameTime);
         }
@@ -203,7 +217,7 @@ namespace SpaceImmigrants
 		{
 			GraphicsDevice.Clear(new Color(30, 32, 39));
 
-			SpriteBatch.Begin();
+			SpriteBatch.Begin(SpriteSortMode.BackToFront, null);
 
 			TimeSpan elapsedGameTime = gameTime.ElapsedGameTime;
 			double delta = (float)elapsedGameTime.TotalSeconds;

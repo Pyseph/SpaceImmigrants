@@ -43,7 +43,6 @@ C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Conten
 C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Content\GameEndedFont.xnb
 C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Content\MongusFly.xnb
 C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Content\MongusTank.xnb
-C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Content\BombProjectile.xnb
 C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\bin\Debug\net6.0-windows\Content\EnemyMongus.xnb
 C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\bin\Debug\net6.0-windows\Content\GameEndedFont.xnb
 C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\bin\Debug\net6.0-windows\Content\heart.xnb
@@ -91,3 +90,5 @@ C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\obj\Debug\net6.0
 C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\obj\Debug\net6.0-windows\ref\SpaceImmigrants.dll
 C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\bin\Debug\net6.0-windows\Content\PlasmaPellet.xnb
 C:\Users\User\Desktop\Main Projects\Open Source\SpaceImmigrants\bin\Debug\net6.0-windows\Content\PointsDisplay.xnb
+C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Content\PlasmaPellet.xnb
+C:\Programmering\SpaceImmigrants\SpaceImmigrants\bin\Debug\net6.0-windows\Content\PointsDisplay.xnb

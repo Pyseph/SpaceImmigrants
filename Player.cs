@@ -16,6 +16,7 @@ namespace SpaceImmigrants
         public Vector2 Velocity = new(0, 0);
         public Vector2 Position;
         public Rectangle PlayerRect;
+        public PlayerProjectileShooter ProjectileShooter;
 
         private Texture2D _playerSprite;
         private Texture2D _movementSprite;
@@ -45,7 +46,7 @@ namespace SpaceImmigrants
             );
 
             this._statusBar = new StatusBar(currentGame);
-            new PlayerProjectileShooter(currentGame);
+            this.ProjectileShooter = new PlayerProjectileShooter(currentGame);
             new PointsDisplay(currentGame);
 
             // Listen to the InputBegan event and move the player when the user presses the arrow keys.
@@ -86,7 +87,12 @@ namespace SpaceImmigrants
 				Game1.SpriteBatch.Draw(
 					texture: this._playerSprite,
 					destinationRectangle: destination,
-                    color: Color.White
+                    color: Color.White,
+                    effects: SpriteEffects.None,
+                    layerDepth: 0.1f,
+                    rotation: 0,
+                    origin: new Vector2(0, 0),
+                    sourceRectangle: null
 				);
 
                 if (this.Velocity.Length() > 0.1)
@@ -101,7 +107,12 @@ namespace SpaceImmigrants
                     Game1.SpriteBatch.Draw(
                         texture: this._movementSprite,
                         destinationRectangle: fireDestination,
-                        color: Color.White
+                        color: Color.White,
+                        effects: SpriteEffects.None,
+                        layerDepth: 0.1f,
+                        rotation: 0,
+                        origin: new Vector2(0, 0),
+                        sourceRectangle: null
                     );
                 }
 			});
@@ -122,7 +133,6 @@ namespace SpaceImmigrants
                 currentGame.GameOver();
             }
         }
-
         public virtual void DetectCollisions(Game1 currentGame, double step)
         {
             _hitCooldown = Math.Max(_hitCooldown - (float)step, 0);

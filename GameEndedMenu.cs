@@ -23,13 +23,18 @@ namespace SpaceImmigrants
                     string message = $"Game Over\nFinal Points: {currentGame.Points}";
                     Vector2 messageSize = this._fontSprite.MeasureString(message);
                     Game1.SpriteBatch.DrawString(
-                        this._fontSprite,
-                        message,
-                        new Vector2(
+                        spriteFont: this._fontSprite,
+                        text: message,
+                        position: new Vector2(
                             Game1.ViewportSize.X / 2 - (messageSize.X / 2),
                             Game1.ViewportSize.Y / 2 - (messageSize.Y / 2)
                         ),
-                        Color.White
+                        color: Color.White,
+                        rotation: 0,
+                        origin: Vector2.Zero,
+                        scale: 1,
+                        effects: SpriteEffects.None,
+                        layerDepth: 0
                     );
                 });
             };

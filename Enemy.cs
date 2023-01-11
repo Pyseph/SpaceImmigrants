@@ -91,7 +91,7 @@ namespace SpaceImmigrants
                     destinationRectangle: destination,
                     sourceRectangle: null,
                     effects: SpriteEffects.None,
-                    layerDepth: 0,
+                    layerDepth: 0.1f,
                     color: Color.White,
                     // pi/2 is 90 degrees in radians, but idk the helper function to convert rad to deg
                     rotation: (float)Math.Atan2(this.Velocity.Y, this.Velocity.X) - MathHelper.PiOver2,

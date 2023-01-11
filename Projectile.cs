@@ -33,9 +33,14 @@ namespace SpaceImmigrants
                 UpdatePosition(step);
                 // Draw with the specified sprite size
                 Game1.SpriteBatch.Draw(
-                    projectileSprite,
-                    this.Rect,
-                    this.Mode == "Player" ? Color.Red : Color.White
+                    texture: projectileSprite,
+                    destinationRectangle: this.Rect,
+                    color: this.Mode == "Player" ? Color.Red : Color.White,
+                    effects: SpriteEffects.None,
+                    layerDepth: 0.1f,
+                    rotation: 0,
+                    origin: new Vector2(0, 0),
+                    sourceRectangle: null
                 );
             });
         }
@@ -54,7 +59,16 @@ namespace SpaceImmigrants
 
         public void Destroy()
         {
-            this._currentGame.DrawQueue.Remove(this);
+            // wait for GamePreStepped to run once before removing the enemy
+            // This is to prevent race conditions with removing objects from the list while also iterating over it
+            void diedConnection(double step)
+			{
+                this._currentGame.DrawQueue.Remove(this);
+                Event.GamePreStepped.Invoked -= diedConnection;
+            }
+
+            Event.InvokedEvent<double>.InvokedDelegate preSteppedConnection = diedConnection;
+            Event.GamePreStepped.Invoked += preSteppedConnection;
         }
 
         public void DetectCollision()
